@@ -1,5 +1,5 @@
-const jwt = require("jsonwebtoken");
-User = require("../models/user");
+import jwt from "jsonwebtoken";
+import { User } from "../models/user.js";
 
 const verifyToken = (req, res, next) => {
   if (
@@ -31,4 +31,4 @@ const verifyToken = (req, res, next) => {
     next();
   }
 };
-module.exports = verifyToken;
+export { verifyToken };

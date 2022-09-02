@@ -1,11 +1,10 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const verifyToken = require("./app/middlewares/authJWT");
-
-require("dotenv").config();
+import express from "express";
+import mongoose from "mongoose";
+import { userRouter } from "./app/routes/user.js";
+import dotENV from "dotenv";
 
 const app = express();
-const userRoutes = require("./app/routes/user");
+dotENV.config();
 try {
   mongoose.connect(
     "mongodb+srv://senricroot:cDVaBEw3DQEKbQMw@senricblink.ashjway.mongodb.net/?retryWrites=true&w=majority",
@@ -34,7 +33,7 @@ app.use(
 );
 
 //using user route
-app.use(userRoutes);
+app.use(userRouter);
 
 app.listen(process.env.PORT || 8080, () =>
   console.log("Example app is listening on port 8080.")

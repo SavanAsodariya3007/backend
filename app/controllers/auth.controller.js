@@ -1,15 +1,15 @@
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+import { User } from "../models/user.js";
 
-const User = require("../models/user");
-const {
+import {
   isEmpty,
   isValidEmail,
   isAllRequireKeyPresent,
   isValidValueForKey,
-} = require("../utils");
+} from "../utils/index.js";
 
-exports.signup = async (req, res) => {
+export async function signup(req, res) {
   if (isEmpty(req.body)) {
     res.status(500).send({
       status: false,
@@ -41,45 +41,39 @@ exports.signup = async (req, res) => {
       return;
     }
 
-    const user = new User({
-      fullName: req.body.fullName,
-      email: req.body.email,
-      role: req.body.role,
-      password: bcrypt.hashSync(req.body.password, 8),
-    });
+    const doesEmailExist = await User.findOne({ email: req.body.email });
+    console.log("doesEmailExist", doesEmailExist);
+    if (doesEmailExist) {
+      res.status(500).send({
+        status: false,
+        message: "Email already exists!",
+      });
+    }
 
-    const newUser = await user.save().catch((error) => {
+    try {
+      const user = new User({
+        fullName: req.body.fullName,
+        email: req.body.email,
+        role: req.body.role,
+        password: bcrypt.hashSync(req.body.password, 8),
+      });
+      const newUser = await user.save();
+      res.status(200).send({
+        status: true,
+        message: "User Registered successfully",
+        user: newUser,
+      });
+    } catch (error) {
+      console.log("Error", error);
       res.status(500).send({
         message: error,
       });
       return;
-    });
-    console.log("ret", newUser);
-    res.status(200).send({
-      status: true,
-      message: "User Registered successfully",
-      ...newUser,
-    });
-
-    // (err, user) => {
-    //   if (err) {
-    //     res.status(500).send({
-    //       message: err,
-    //     });
-    //     return;
-    //   } else {
-    //     console.log("user", user);
-    //     res.status(200).send({
-    //       status: true,
-    //       message: "User Registered successfully",
-    //       ...user,
-    //     });
-    //   }
-    // }
+    }
   }
-};
+}
 
-exports.signin = (req, res) => {
+export function signin(req, res) {
   User.findOne({
     email: req.body.email,
   }).exec((err, user) => {
@@ -126,4 +120,4 @@ exports.signin = (req, res) => {
       accessToken: token,
     });
   });
-};
+}
