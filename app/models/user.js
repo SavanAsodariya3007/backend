@@ -29,12 +29,10 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
-    created: {
-      type: Date,
-      default: Date.now,
-    },
+    devices: [{ type: mongoose.Schema.Types.ObjectId, ref: "Device" }],
   },
   {
+    timestamps: true,
     toJSON: {
       transform(doc, ret) {
         delete ret.password;

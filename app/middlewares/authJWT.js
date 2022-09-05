@@ -1,34 +1,31 @@
 import jwt from "jsonwebtoken";
 import { User } from "../models/user.js";
 
-const verifyToken = (req, res, next) => {
-  if (
-    req.headers &&
-    req.headers.authorization &&
-    req.headers.authorization.split(" ")[0] === "JWT"
-  ) {
-    jwt.verify(
-      req.headers.authorization.split(" ")[1],
-      process.env.API_SECRET,
-      function (err, decode) {
-        if (err) req.user = undefined;
-        User.findOne({
-          _id: decode.id,
-        }).exec((err, user) => {
-          if (err) {
-            res.status(500).send({
-              message: err,
-            });
-          } else {
-            req.user = user;
-            next();
-          }
-        });
+const verifyToken = async (req, res, next) => {
+  const bearerHeader = req.headers["authorization"];
+  try {
+    if (typeof bearerHeader === "undefined") {
+      res.handler.badRequest(undefined, "Token is required!");
+    }
+    const bearer = bearerHeader.split(" ");
+    if (String(bearer[0]) !== "Bearer") {
+      res.handler.badRequest(undefined, "Bearer token is required!");
+    }
+    const token = bearer[1];
+    jwt.verify(token, process.env.API_SECRET, async (err, decode) => {
+      if (err) {
+        res.handler.badRequest(undefined, err?.message);
       }
-    );
-  } else {
-    req.user = undefined;
-    next();
+      const user = await User.findOne({ _id: decode.id });
+      if (!user) {
+        res.handler.badRequest(undefined, "Something went wrong with token!");
+      }
+      req.body.user = user;
+      next();
+    });
+  } catch (error) {
+    console.log("user.verify token error====>", error);
+    res.handler.badRequest(undefined, error.message);
   }
 };
 export { verifyToken };

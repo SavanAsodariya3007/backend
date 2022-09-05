@@ -1,9 +1,14 @@
 import express from "express";
 import mongoose from "mongoose";
-import { userRouter } from "./app/routes/user.js";
 import dotENV from "dotenv";
 
+import { ResponseHandler } from "./app/Configs/responseHandler.js";
+import { verifyToken } from "./app/middlewares/authJWT.js";
+import { userRouter } from "./app/routes/user.js";
+import { deviceRouter } from "./app/routes/device.js";
+
 const app = express();
+const PORT = process.env.PORT || 8080;
 dotENV.config();
 try {
   mongoose.connect(
@@ -18,9 +23,9 @@ try {
   handleError(error);
 }
 
-process.on("unhandledRejection", (error) => {
-  console.log("unhandledRejection", error.message);
-});
+// process.on("unhandledRejection", (error) => {
+//   console.log("unhandledRejection", error.message);
+// });
 
 // parse requests of content-type - application/json
 app.use(express.json());
@@ -32,9 +37,18 @@ app.use(
   })
 );
 
-//using user route
-app.use(userRouter);
+app.use((req, res, next) => {
+  res.handler = new ResponseHandler(req, res);
+  next();
+});
 
-app.listen(process.env.PORT || 8080, () =>
-  console.log("Example app is listening on port 8080.")
+app.get("/", (req, res) => {
+  res.send("GET request to the homepage");
+});
+
+app.use("/users", userRouter);
+app.use("/devices", verifyToken, deviceRouter);
+
+app.listen(PORT, () =>
+  console.log(`Example app is listening on port ${PORT}.`)
 );
