@@ -1,8 +1,5 @@
 import express from "express";
-import { body } from "express-validator";
-import { deviceController } from "../controllers/DeviceController.js";
-
-import { validate } from "../middlewares/validator.js";
+import { deviceController } from "./device.controller.js";
 
 export const deviceRouter = express.Router();
 

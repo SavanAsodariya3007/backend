@@ -2,14 +2,15 @@ import express from "express";
 import mongoose from "mongoose";
 import dotENV from "dotenv";
 
-import { ResponseHandler } from "./app/Configs/responseHandler.js";
+import { ResponseHandler } from "./app/configs/responseHandler.js";
 import { verifyToken } from "./app/middlewares/authJWT.js";
-import { userRouter } from "./app/routes/user.js";
-import { deviceRouter } from "./app/routes/device.js";
+import { userRouter } from "./app/routes/users/users.route.js";
+import { deviceRouter } from "./app/routes/device/device.route.js";
 
 const app = express();
 const PORT = process.env.PORT || 8080;
 dotENV.config();
+
 try {
   mongoose.connect(
     "mongodb+srv://senricroot:cDVaBEw3DQEKbQMw@senricblink.ashjway.mongodb.net/?retryWrites=true&w=majority",
