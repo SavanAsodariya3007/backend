@@ -9,20 +9,25 @@ import { deviceRouter } from "./app/routes/device/device.route.js";
 
 const app = express();
 const PORT = process.env.PORT || 8080;
+let isDBConnect = false;
 dotENV.config();
 
-try {
-  mongoose.connect(
+mongoose
+  .connect(
     "mongodb+srv://senricroot:cDVaBEw3DQEKbQMw@senricblink.ashjway.mongodb.net/?retryWrites=true&w=majority",
     {
       useUnifiedTopology: true,
       useNewUrlParser: true,
     }
-  );
-  console.log("connected to db");
-} catch (error) {
-  handleError(error);
-}
+  )
+  .then(() => {
+    console.log("connected to db");
+    isDBConnect = true;
+  })
+  .catch((error) => {
+    console.log("DB connection error:-", error);
+    isDBConnect = false;
+  });
 
 // process.on("unhandledRejection", (error) => {
 //   console.log("unhandledRejection", error.message);
@@ -43,8 +48,11 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get("/", (req, res) => {
-  res.send("GET request to the homepage");
+app.use((req, res, next) => {
+  if (isDBConnect) {
+    next();
+  }
+  res.handler.serverError(undefined, undefined, "Database connection error!");
 });
 
 app.use("/users", userRouter);
