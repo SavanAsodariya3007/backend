@@ -49,10 +49,11 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
-  if (isDBConnect) {
-    next();
-  }
-  res.handler.serverError(undefined, undefined, "Database connection error!");
+  console.log("Connection state", isDBConnect);
+  // if (isDBConnect) {
+  // }
+  next();
+  // res.handler.serverError(undefined, undefined, "Database connection error!");
 });
 
 app.use("/users", userRouter);

@@ -17,6 +17,7 @@ const verifyToken = async (req, res, next) => {
         res.handler.badRequest(undefined, err?.message);
       }
       const user = await User.findOne({ _id: decode.id });
+      console.log("user", user);
       if (!user) {
         res.handler.badRequest(undefined, "Something went wrong with token!");
       }

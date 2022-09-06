@@ -10,7 +10,7 @@ class UserController {
       if (userDB) {
         throw new Error("E-mail already exists!");
       }
-      const { isError, data } = usersService.addUser(req.body);
+      const { isError, data } = await usersService.addUser(req.body);
       if (isError) {
         throw data;
       }

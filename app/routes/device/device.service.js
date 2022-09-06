@@ -1,3 +1,4 @@
+import { User } from "../users/users.model.js";
 import { Device } from "./device.model.js";
 
 class DeviceService {
@@ -7,7 +8,11 @@ class DeviceService {
       description,
       userId: user._id,
     });
-    await newDevice.save();
+    const insertedRecord = await newDevice.save();
+    const device_id = insertedRecord?._id;
+    user.devices = user.devices || [];
+    user.devices.push(device_id);
+    user.save();
     return newDevice;
   }
   async getDeviceByUser(user) {

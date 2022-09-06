@@ -1,5 +1,5 @@
 import { User } from "./users.model.js";
-
+import bcrypt from "bcrypt";
 class UsersService {
   async addUser(body) {
     try {
